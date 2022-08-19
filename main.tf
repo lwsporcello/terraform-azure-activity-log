@@ -165,14 +165,14 @@ data "azurerm_subscriptions" "available" {}
 
 resource "azurerm_role_assignment" "lacework" {
   for_each = {
-    "EventGrid EventSubscription Reader"   = "2414bbcf-6497-4faf-8c65-045460748405"
-    "Storage Blob Data Reader"             = "2a2b9908-6ea1-4ae2-8e65-a410df84e7d1"
-    "Storage Queue Data Message Processor" = "8a0f0c08-91a1-4084-bc3d-661d67233fed"
+    "role1" = "EventGrid EventSubscription Reader"
+    "role2" = "Storage Blob Data Reader"
+    "role3" = "Storage Queue Data Message Processor"
   }
   #role_definition_id = azurerm_role_definition.lacework.role_definition_resource_id
-  role_definition_id = each.value
-  principal_id       = local.service_principal_id
-  scope              = "${data.azurerm_subscription.primary.id}/resourceGroups/${local.storage_account_resource_group}"
+  role_definition_name = each.value
+  principal_id         = local.service_principal_id
+  scope                = "${data.azurerm_subscription.primary.id}/resourceGroups/${local.storage_account_resource_group}"
 }
 
 # wait for X seconds for the Azure resources to be created
