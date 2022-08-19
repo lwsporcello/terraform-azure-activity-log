@@ -62,8 +62,8 @@ variable "subscription_ids" {
   default     = []
 }
 variable "tags" {
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
   description = "Key-value map of Tag names and Tag values"
 }
 variable "use_existing_ad_application" {

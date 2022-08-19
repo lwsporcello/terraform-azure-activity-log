@@ -136,35 +136,41 @@ data "azurerm_subscription" "primary" {}
 data "azurerm_subscriptions" "available" {}
 
 # centralized storage account, we only need a single role to read from a single storage account
-resource "azurerm_role_definition" "lacework" {
-  name        = "${var.prefix}-role-${random_id.uniq.hex}"
-  description = "Used by Lacework to monitor Activity Logs"
-  scope       = "${data.azurerm_subscription.primary.id}/resourceGroups/${local.storage_account_resource_group}"
+#resource "azurerm_role_definition" "lacework" {
+#  name        = "${var.prefix}-role-${random_id.uniq.hex}"
+#  description = "Used by Lacework to monitor Activity Logs"
+#  scope       = "${data.azurerm_subscription.primary.id}/resourceGroups/${local.storage_account_resource_group}"
 
-  assignable_scopes = [
-    "${data.azurerm_subscription.primary.id}/resourceGroups/${local.storage_account_resource_group}"
-  ]
+#  assignable_scopes = [
+#    "${data.azurerm_subscription.primary.id}/resourceGroups/${local.storage_account_resource_group}"
+#  ]
 
-  permissions {
-    actions = [
-      "Microsoft.Resources/subscriptions/resourceGroups/read",
-      "Microsoft.Storage/storageAccounts/read",
-      "Microsoft.Storage/storageAccounts/blobServices/containers/read",
-      "Microsoft.Storage/storageAccounts/queueServices/queues/read",
-      "Microsoft.EventGrid/eventSubscriptions/read",
-      "Microsoft.Storage/storageAccounts/listkeys/action"
-    ]
+#  permissions {
+#    actions = [
+#-      "Microsoft.Resources/subscriptions/resourceGroups/read",
+#      "Microsoft.Storage/storageAccounts/read",
+#-      "Microsoft.Storage/storageAccounts/blobServices/containers/read",
+#      "Microsoft.Storage/storageAccounts/queueServices/queues/read",
+#-      "Microsoft.EventGrid/eventSubscriptions/read",
+#      "Microsoft.Storage/storageAccounts/listkeys/action"
+#    ]
 
-    data_actions = [
-      "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read",
-      "Microsoft.Storage/storageAccounts/queueServices/queues/messages/read",
-      "Microsoft.Storage/storageAccounts/queueServices/queues/messages/delete"
-    ]
-  }
-}
+#    data_actions = [
+#-      "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read",
+#-      "Microsoft.Storage/storageAccounts/queueServices/queues/messages/read",
+#      "Microsoft.Storage/storageAccounts/queueServices/queues/messages/delete"
+#    ]
+#  }
+#}
 
 resource "azurerm_role_assignment" "lacework" {
-  role_definition_id = azurerm_role_definition.lacework.role_definition_resource_id
+  for_each = {
+    "EventGrid EventSubscription Reader"   = "2414bbcf-6497-4faf-8c65-045460748405"
+    "Storage Blob Data Reader"             = "2a2b9908-6ea1-4ae2-8e65-a410df84e7d1"
+    "Storage Queue Data Message Processor" = "8a0f0c08-91a1-4084-bc3d-661d67233fed"
+  }
+  #role_definition_id = azurerm_role_definition.lacework.role_definition_resource_id
+  role_definition_id = each.value
   principal_id       = local.service_principal_id
   scope              = "${data.azurerm_subscription.primary.id}/resourceGroups/${local.storage_account_resource_group}"
 }
