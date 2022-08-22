@@ -166,7 +166,9 @@ data "azurerm_subscriptions" "available" {}
 resource "azurerm_role_assignment" "lacework" {
   for_each = {
     "role1" = "EventGrid EventSubscription Reader"
-    "role2" = "Storage Account Contributor"
+    "role2" = "Storage Blob Data Reader"
+    "role3" = "Storage Queue Data Message Processor"
+    "role4" = "Storage Account Contributor"
   }
   #role_definition_id = azurerm_role_definition.lacework.role_definition_resource_id
   role_definition_name = each.value
